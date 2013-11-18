@@ -1,0 +1,24 @@
+:general:
+  date_template: "%Y-%m-%d"
+  changelog_name: "Changelog"
+  changelog_formats:
+    - "html"
+    - "pdf"
+  changelog_css: 
+  verbose: false
+
+:fogbugz:
+  fogbugz_url: "https://fogbugz.praqma.net"
+  fogbugz_usr: "hleote@praqma.net"
+  fogbugz_pwd: "Hugo2013"
+  fogbugz_fields: "sTitle,sStatus,sUrl,sCategory,sTags,sPriority,sReleaseNotes"
+  regex:
+    - '/[Case|\[Case\]|fixed]\s(?<id>([0-9]+))+/i'
+    - '/(?<id>JENKINS-[0-9]+)/i'
+
+
+:vcs:
+  type: hg
+  usr:
+  pwd:
+  repo_location: "/home/hugo/test_repo/pack_hg"
