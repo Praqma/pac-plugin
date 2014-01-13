@@ -30,8 +30,10 @@ import hudson.model.Descriptor;
 import java.io.File;
 import java.io.Serializable;
 import jenkins.model.Jenkins;
+import net.praqma.jenkins.pac.exception.TailParameterNotFoundException;
 import net.praqma.util.execute.CommandLine;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -49,7 +51,7 @@ public class CommitsByDate extends PACRunCommand implements Serializable {
         this.tail = tail;
         this.head = head == null ? "" : head;
     }
-    
+
     public CommitsByDate() {
     }
 
@@ -69,23 +71,24 @@ public class CommitsByDate extends PACRunCommand implements Serializable {
     public void setHead(String head) {
         this.head = head;
     }
-   
 
     @Override
     public Descriptor<PACRunCommand> getDescriptor() {
         return (Descriptor<PACRunCommand>) Jenkins.getInstance().getDescriptorOrDie(getClass());
     }
 
-
     @Override
-    public String run(File workspace, String settingsFile, String pathToPac) {
-       String command = String.format("ruby %s -d %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
-       CommandLine.getInstance().run(command, workspace);
+    public String run(File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException {
+        if(StringUtils.isBlank(tail)) {
+            throw new TailParameterNotFoundException();
+        }
+        String command = String.format("ruby %s -d %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
+        CommandLine.getInstance().run(command, workspace);
         return command;
     }
 
-@Extension
-public static final class DescriptorImpl extends PACRunCommandDescriptor<CommitsByDate> {
+    @Extension
+    public static final class DescriptorImpl extends PACRunCommandDescriptor<CommitsByDate> {
 
         @Override
         public String getDisplayName() {

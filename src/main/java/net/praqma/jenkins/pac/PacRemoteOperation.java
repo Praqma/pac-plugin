@@ -34,6 +34,7 @@ import java.io.FileReader;
 import java.util.HashMap;
 import net.praqma.jenkins.pac.exception.PacPathNotFoundException;
 import net.praqma.jenkins.pac.exception.SettingsFileNotFoundException;
+import net.praqma.jenkins.pac.exception.TailParameterNotFoundException;
 
 /**
  * @author Praqma
@@ -45,8 +46,7 @@ public class PacRemoteOperation implements FilePath.FileCallable<String> {
     private PACRunCommand pac;
     private String pathToPac;
 
-    public PacRemoteOperation() {
-    }
+    public PacRemoteOperation() { }
 
     public PacRemoteOperation(String pathToPac, String settingsFile, PACRunCommand pac) {
         this.pathToPac = pathToPac;
@@ -84,7 +84,7 @@ public class PacRemoteOperation implements FilePath.FileCallable<String> {
     }
 
     @Override
-    public String invoke(File f, VirtualChannel channel) throws PacPathNotFoundException, SettingsFileNotFoundException, InterruptedException, FileNotFoundException, YamlException {
+    public String invoke(File f, VirtualChannel channel) throws TailParameterNotFoundException, PacPathNotFoundException, SettingsFileNotFoundException, InterruptedException, FileNotFoundException, YamlException {
 
         File path = absolutifyPacFile(f);
         File settings = absolutifySettingsFile(f);

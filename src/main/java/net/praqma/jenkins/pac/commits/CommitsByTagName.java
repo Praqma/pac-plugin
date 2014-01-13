@@ -30,8 +30,10 @@ import hudson.model.Descriptor;
 import java.io.File;
 import java.io.Serializable;
 import jenkins.model.Jenkins;
+import net.praqma.jenkins.pac.exception.TailParameterNotFoundException;
 import net.praqma.util.execute.CommandLine;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -76,7 +78,10 @@ public class CommitsByTagName extends PACRunCommand implements Serializable {
     }
 
     @Override
-    public String run(File workspace, String settingsFile, String pathToPac) {
+    public String run(File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException {
+        if(StringUtils.isBlank(tail)) {
+            throw new TailParameterNotFoundException();
+        }
         String command = String.format("ruby %s -t %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
         CommandLine.getInstance().run(command, workspace);
         return command;

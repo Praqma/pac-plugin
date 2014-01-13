@@ -27,10 +27,12 @@ import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
+import net.praqma.jenkins.pac.exception.TailParameterNotFoundException;
 
 /**
  *
@@ -38,10 +40,11 @@ import jenkins.model.Jenkins;
  */
 public abstract class PACRunCommand implements Describable<PACRunCommand>, ExtensionPoint {
    
-    public abstract String run(File workspace, String settingsFile, String pathToPac);
+    public abstract String run(File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException;
     public abstract String getTail();
     protected static final Logger logger = Logger.getLogger(PACRunCommand.class.toString());
 
+    public PACRunCommand() { }
     
     public static DescriptorExtensionList<PACRunCommand, PACRunCommandDescriptor<PACRunCommand>> all() {
         return Jenkins.getInstance().<PACRunCommand, PACRunCommandDescriptor<PACRunCommand>>getDescriptorList(PACRunCommand.class);

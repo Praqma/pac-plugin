@@ -32,6 +32,7 @@ import net.praqma.jenkins.pac.command.PACRunCommand;
 import net.praqma.jenkins.pac.command.PACRunCommandDescriptor;
 import net.praqma.util.execute.CommandLine;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -49,8 +50,7 @@ public class LatestTagByPattern extends PACRunCommand implements Serializable {
         this.pattern = pattern;
     }
 
-    public LatestTagByPattern() {
-    }
+    public LatestTagByPattern() {    }
 
     @Override
     public String getTail() {
@@ -60,6 +60,10 @@ public class LatestTagByPattern extends PACRunCommand implements Serializable {
     public void setPattern(String pattern) {
         this.pattern = pattern;
     }
+    
+    public String getPattern() {
+        return pattern;
+    }
 
     @Override
     public Descriptor<PACRunCommand> getDescriptor() {
@@ -68,7 +72,10 @@ public class LatestTagByPattern extends PACRunCommand implements Serializable {
 
     @Override
     public String run(File workspace, String settingsFile, String pathToPac) {
-        String latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s --pattern=%s", pathToPac, settingsFile, workspace.getAbsolutePath(), "'" + getTail() + "'");
+        String latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s", pathToPac, settingsFile, workspace.getAbsolutePath(), "'" + getTail() + "'");
+        if(!StringUtils.isBlank(pattern)) {
+            latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s --pattern='%s'", pathToPac, settingsFile, workspace.getAbsolutePath(), "'" + getTail() + "'",pattern);
+        }
         CommandLine.getInstance().run(latestCommand, workspace);
         return latestCommand;
     }

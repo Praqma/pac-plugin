@@ -61,7 +61,7 @@ public class PacBuilder extends Builder {
         this.pac = pac;
         this.pathToPac = StringUtils.isBlank(pathToPac) ? "pac.rb" : pathToPac;
     }
-
+    
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, PacPathNotFoundException, SettingsFileNotFoundException, TailParameterNotFoundException {
 
@@ -71,7 +71,7 @@ public class PacBuilder extends Builder {
             String generatedChangeLog = build.getWorkspace().act(new PacRemoteOperation(pathToPac, settingsFile, pac));
             File buildRoot = new File(build.getRootDir(), generatedChangeLog);
             FilePath local = new FilePath(buildRoot);
-            List<FilePath> files = build.getWorkspace().list(new PacBuilder.PacChangelogFileFilter(generatedChangeLog));
+            List<FilePath> files = build.getWorkspace().list(new PacChangelogFileFilter(generatedChangeLog));
 
             if (files.isEmpty()) {
                 out.println("No changelog created, no commits in your selection.");
@@ -83,10 +83,6 @@ public class PacBuilder extends Builder {
                 PacBuildAction action = new PacBuildAction(build, generatedChangeLog);
                 build.addAction(action);
             }
-            if (StringUtils.isBlank(pac.getTail())) {
-                throw new TailParameterNotFoundException();
-            }
-
         } catch (TailParameterNotFoundException tpnf) {
             tpnf.printToConsole(out);
             return false;
@@ -104,25 +100,7 @@ public class PacBuilder extends Builder {
         return true;
     }
 
-    public class PacChangelogFileFilter implements FileFilter, Serializable {
 
-        private String changelog_name;
-
-        public PacChangelogFileFilter() {
-        }
-
-        public PacChangelogFileFilter(String changelog_name) {
-            this.changelog_name = changelog_name;
-        }
-
-        @Override
-        public boolean accept(File pathname) {
-            if (pathname.getAbsolutePath().contains(changelog_name)) {
-                return true;
-            }
-            return false;
-        }
-    }
 
     @Extension
     public static class PacBuilderImpl extends BuildStepDescriptor<Builder> {
