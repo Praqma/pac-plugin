@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013 Praqma.
+ * Copyright 2014 mads.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,27 +23,20 @@
  */
 package net.praqma.jenkins.pac;
 
-import hudson.model.AbstractBuild;
-import hudson.model.Action;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import hudson.model.AbstractProject;
+import hudson.model.Actionable;
+import hudson.model.ProminentProjectAction;
 
 /**
  *
- * @author Praqma
+ * @author mads
  */
-public class PacBuildAction implements Action {
-
-    public String name;
-    public String root;
-    public final AbstractBuild<?,?> build;
-
-    public PacBuildAction(AbstractBuild<?, ?> build, String name) {
-        this.name = name;
-        this.build = build;
-        this.root = new File(build.getRootDir(), name).getAbsolutePath();
+public class PacProjectAction extends Actionable implements ProminentProjectAction {
+    
+    public final AbstractProject<?,?> project;
+    
+    public PacProjectAction(final AbstractProject<?,?> project) {
+        this.project = project;
     }
 
     @Override
@@ -53,41 +46,26 @@ public class PacBuildAction implements Action {
 
     @Override
     public String getDisplayName() {
-        return "PAC Publisher";
+        return "Latest PAC";
     }
 
     @Override
     public String getUrlName() {
-        return "pac-publisher";
+        return getLatestPacBuildAction().build.number+ "/pac-publisher";
+    }
+
+    @Override
+    public String getSearchUrl() {
+        return "pac-search";
     }
     
-    @Override
-    public String toString() {
-        String fileString = null;
-        try {
-            fileString = readFile();
-        } catch (IOException ex) {
-            ex.getMessage();
+    public PacBuildAction getLatestPacBuildAction() {
+        if(project.getLastSuccessfulBuild() == null) {
+            return null;
+        } else {
+            return project.getLastSuccessfulBuild().getAction(PacBuildAction.class);
         }
-        return fileString;
+         
     }
-
-
-    public String readFile() throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(root));
-
-        try {
-            StringBuilder stringBuilder = new StringBuilder();
-            String line = bufferedReader.readLine();
-
-            while (line != null) {
-                stringBuilder.append(line);
-                stringBuilder.append("\n");
-                line = bufferedReader.readLine();
-            }
-            return stringBuilder.toString();
-        } finally {
-            bufferedReader.close();
-        }
-    }
+    
 }

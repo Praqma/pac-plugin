@@ -41,6 +41,7 @@ import net.praqma.jenkins.pac.exception.TailParameterNotFoundException;
 public abstract class PACRunCommand implements Describable<PACRunCommand>, ExtensionPoint {
    
     public abstract String run(File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException;
+    public abstract String getCommand(File workspace, String settingsFile, String pathToPac);
     public abstract String getTail();
     protected static final Logger logger = Logger.getLogger(PACRunCommand.class.toString());
 

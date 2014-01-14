@@ -27,6 +27,7 @@ import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
 import net.praqma.jenkins.pac.command.PACRunCommand;
 import hudson.FilePath;
+import hudson.model.BuildListener;
 import hudson.remoting.VirtualChannel;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,13 +46,15 @@ public class PacRemoteOperation implements FilePath.FileCallable<String> {
     private String settingsFile;
     private PACRunCommand pac;
     private String pathToPac;
+    private BuildListener listener;
 
     public PacRemoteOperation() { }
 
-    public PacRemoteOperation(String pathToPac, String settingsFile, PACRunCommand pac) {
+    public PacRemoteOperation(String pathToPac, String settingsFile, PACRunCommand pac, BuildListener listener) {
         this.pathToPac = pathToPac;
         this.settingsFile = settingsFile;
         this.pac = pac;
+        this.listener = listener;
     }
 
     public File absolutifyPacFile(File workspace) throws PacPathNotFoundException {
@@ -88,7 +91,7 @@ public class PacRemoteOperation implements FilePath.FileCallable<String> {
 
         File path = absolutifyPacFile(f);
         File settings = absolutifySettingsFile(f);
-        
+        listener.getLogger().println(String.format("Executing command: %s", pac.getCommand(f, settingsFile, pathToPac)));
         getPac().run(f, settings.getAbsolutePath(), path.getAbsolutePath());
 
         YamlReader reader = new YamlReader(new FileReader(settings.getAbsolutePath()));

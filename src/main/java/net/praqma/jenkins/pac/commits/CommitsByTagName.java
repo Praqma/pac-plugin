@@ -48,13 +48,13 @@ public class CommitsByTagName extends PACRunCommand implements Serializable {
 
     @DataBoundConstructor
     public CommitsByTagName(String tail, String head) {
-        this.tail =  tail;
+        this.tail = tail;
         this.head = head == null ? "" : head;
     }
 
     public CommitsByTagName() {
     }
-    
+
     @Override
     public String getTail() {
         return tail;
@@ -79,18 +79,21 @@ public class CommitsByTagName extends PACRunCommand implements Serializable {
 
     @Override
     public String run(File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException {
-        if(StringUtils.isBlank(tail)) {
+        if (StringUtils.isBlank(tail)) {
             throw new TailParameterNotFoundException();
         }
-        String command = String.format("ruby %s -t %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
+        String command = getCommand(workspace, settingsFile, pathToPac);
         CommandLine.getInstance().run(command, workspace);
         return command;
     }
 
-    
+    @Override
+    public String getCommand(File workspace, String settingsFile, String pathToPac) {
+        return String.format("ruby %s -t %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
+    }
 
-@Extension
-public static final class DescriptorImpl extends PACRunCommandDescriptor<CommitsByTagName> {
+    @Extension
+    public static final class DescriptorImpl extends PACRunCommandDescriptor<CommitsByTagName> {
 
         @Override
         public String getDisplayName() {

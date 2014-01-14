@@ -41,14 +41,14 @@ public class PacRemoteOperationTest {
     
     @Test (expected = SettingsFileNotFoundException.class)
     public void testAbsolutifySettingsFileNotFound() throws SettingsFileNotFoundException {
-        PacRemoteOperation pro = new PacRemoteOperation(null, "unexisting.yml", null);
+        PacRemoteOperation pro = new PacRemoteOperation(null, "unexisting.yml", null, null);
         File settingsFile = new File(PacRemoteOperationTest.class.getResource("").getFile());
         pro.absolutifySettingsFile(settingsFile);
     }
     
     @Test (expected = PacPathNotFoundException.class)
     public void testAbsolutifyPacFileNotFound() throws PacPathNotFoundException{
-        PacRemoteOperation pro = new PacRemoteOperation("unexisting.rb", null, null);
+        PacRemoteOperation pro = new PacRemoteOperation("unexisting.rb", null, null, null);
         File pacFile = new File(PacRemoteOperationTest.class.getResource("").getFile());
         pro.absolutifyPacFile(pacFile);
     }

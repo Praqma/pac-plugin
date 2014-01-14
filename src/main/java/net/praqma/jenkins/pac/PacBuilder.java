@@ -30,14 +30,13 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.util.List;
 import net.praqma.jenkins.pac.exception.PacPathNotFoundException;
 import net.praqma.jenkins.pac.exception.SettingsFileNotFoundException;
@@ -68,7 +67,7 @@ public class PacBuilder extends Builder {
         PrintStream out = listener.getLogger();
 
         try {
-            String generatedChangeLog = build.getWorkspace().act(new PacRemoteOperation(pathToPac, settingsFile, pac));
+            String generatedChangeLog = build.getWorkspace().act(new PacRemoteOperation(pathToPac, settingsFile, pac, listener));
             File buildRoot = new File(build.getRootDir(), generatedChangeLog);
             FilePath local = new FilePath(buildRoot);
             List<FilePath> files = build.getWorkspace().list(new PacChangelogFileFilter(generatedChangeLog));
@@ -82,6 +81,7 @@ public class PacBuilder extends Builder {
                 }
                 PacBuildAction action = new PacBuildAction(build, generatedChangeLog);
                 build.addAction(action);
+                
             }
         } catch (TailParameterNotFoundException tpnf) {
             tpnf.printToConsole(out);
@@ -100,8 +100,11 @@ public class PacBuilder extends Builder {
         return true;
     }
 
-
-
+    @Override
+    public Action getProjectAction(final AbstractProject<?,?> project) {
+        return new PacProjectAction(project);
+    }
+    
     @Extension
     public static class PacBuilderImpl extends BuildStepDescriptor<Builder> {
 
@@ -118,6 +121,6 @@ public class PacBuilder extends Builder {
         public String getDisplayName() {
             return "PAC Changelog Generator";
         }
-        
+     
     }
 }

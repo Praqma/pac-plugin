@@ -72,11 +72,17 @@ public class LatestTagByPattern extends PACRunCommand implements Serializable {
 
     @Override
     public String run(File workspace, String settingsFile, String pathToPac) {
+        String latestCommand = getCommand(workspace, settingsFile, pathToPac);
+        CommandLine.getInstance().run(latestCommand, workspace);
+        return latestCommand;
+    }
+
+    @Override
+    public String getCommand(File workspace, String settingsFile, String pathToPac) {
         String latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s", pathToPac, settingsFile, workspace.getAbsolutePath(), "'" + getTail() + "'");
         if(!StringUtils.isBlank(pattern)) {
             latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s --pattern='%s'", pathToPac, settingsFile, workspace.getAbsolutePath(), "'" + getTail() + "'",pattern);
         }
-        CommandLine.getInstance().run(latestCommand, workspace);
         return latestCommand;
     }
 

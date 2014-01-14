@@ -42,17 +42,16 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Praqma
  */
 public class CommitsBySha extends PACRunCommand implements Serializable {
-    
+
     private String tail;
     private String head;
-
 
     @DataBoundConstructor
     public CommitsBySha(String tail, String head) {
         this.tail = tail;
         this.head = head == null ? "" : head;
     }
-    
+
     public CommitsBySha() {
     }
 
@@ -80,16 +79,22 @@ public class CommitsBySha extends PACRunCommand implements Serializable {
 
     @Override
     public String run(File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException {
-        if(StringUtils.isBlank(tail)) {
+        if (StringUtils.isBlank(tail)) {
             throw new TailParameterNotFoundException();
         }
-        String command = String.format("ruby %s -s %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
+
+        String command = getCommand(workspace, settingsFile, pathToPac);
         CommandLine.getInstance().run(command, workspace);
         return command;
     }
 
-@Extension
-public static final class DescriptorImpl extends PACRunCommandDescriptor<CommitsBySha> {
+    @Override
+    public String getCommand(File workspace, String settingsFile, String pathToPac) {
+        return String.format("ruby %s -s %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
+    }
+
+    @Extension
+    public static final class DescriptorImpl extends PACRunCommandDescriptor<CommitsBySha> {
 
         @Override
         public String getDisplayName() {

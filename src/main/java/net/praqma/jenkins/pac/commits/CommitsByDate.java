@@ -82,9 +82,14 @@ public class CommitsByDate extends PACRunCommand implements Serializable {
         if(StringUtils.isBlank(tail)) {
             throw new TailParameterNotFoundException();
         }
-        String command = String.format("ruby %s -d %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
-        CommandLine.getInstance().run(command, workspace);
-        return command;
+        String cmd = getCommand(workspace, settingsFile, pathToPac);
+        CommandLine.getInstance().run(cmd, workspace);
+        return cmd;
+    }
+
+    @Override
+    public String getCommand(File workspace, String settingsFile, String pathToPac) {
+        return String.format("ruby %s -d %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
     }
 
     @Extension
