@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.pac.commits;
 
+import hudson.EnvVars;
 import net.praqma.jenkins.pac.command.PACRunCommandDescriptor;
 import net.praqma.jenkins.pac.command.PACRunCommand;
 import hudson.Extension;
@@ -78,19 +79,19 @@ public class CommitsBySha extends PACRunCommand implements Serializable {
     }
 
     @Override
-    public String run(File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException {
+    public String run(EnvVars vars, File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException {
         if (StringUtils.isBlank(tail)) {
             throw new TailParameterNotFoundException();
         }
 
-        String command = getCommand(workspace, settingsFile, pathToPac);
+        String command = getCommand(workspace, settingsFile, pathToPac, vars);
         CommandLine.getInstance().run(command, workspace);
         return command;
     }
 
     @Override
-    public String getCommand(File workspace, String settingsFile, String pathToPac) {
-        return String.format("ruby %s -s %s %s --settings=%s --outpath=%s", pathToPac, tail, head, settingsFile, workspace.getAbsolutePath());
+    public String getCommand(File workspace, String settingsFile, String pathToPac, EnvVars vars) {
+        return String.format("ruby %s -s %s %s --settings=%s --outpath=%s", pathToPac, vars.expand(tail), vars.expand(head), settingsFile, workspace.getAbsolutePath());
     }
 
     @Extension

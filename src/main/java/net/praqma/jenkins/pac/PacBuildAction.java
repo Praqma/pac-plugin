@@ -35,20 +35,19 @@ import java.io.IOException;
  * @author Praqma
  */
 public class PacBuildAction implements Action {
-
-    public String name;
-    public String root;
+    
+    public final static String PAC_CHANGELOG_URL_NAME = "pac-changelog";
+    public final File createdChangelog;
     public final AbstractBuild<?,?> build;
 
-    public PacBuildAction(AbstractBuild<?, ?> build, String name) {
-        this.name = name;
+    public PacBuildAction(AbstractBuild<?, ?> build, File createdChangelog) {
         this.build = build;
-        this.root = new File(build.getRootDir(), name).getAbsolutePath();
+        this.createdChangelog = createdChangelog;
     }
 
     @Override
     public String getIconFileName() {
-        return "/plugin/PAC-plugin/images/64x64/pac-logo.png";
+        return PacBuilder.LOGO_LOCATION;
     }
 
     @Override
@@ -58,7 +57,7 @@ public class PacBuildAction implements Action {
 
     @Override
     public String getUrlName() {
-        return "pac-publisher";
+        return PAC_CHANGELOG_URL_NAME;
     }
     
     @Override
@@ -74,7 +73,7 @@ public class PacBuildAction implements Action {
 
 
     public String readFile() throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(root));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(createdChangelog));
 
         try {
             StringBuilder stringBuilder = new StringBuilder();

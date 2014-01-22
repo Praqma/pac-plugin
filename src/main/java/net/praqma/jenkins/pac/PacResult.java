@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2013 Praqma.
+ * Copyright 2014 mads.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,32 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.pac.exception;
+package net.praqma.jenkins.pac;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.Serializable;
+import java.util.HashMap;
 
 /**
  *
- * @author Praqma
+ * @author mads
  */
-public class PacPathNotFoundException extends IOException {
+public class PacResult implements Serializable {
+    public final HashMap<?,?> settings;
     
-    File computed;
-
-    public PacPathNotFoundException() {
-        super();
-    } 
-
-    public PacPathNotFoundException(File computed) {
-        this.computed = computed;
+    public PacResult() { 
+        settings = null;
     }
-       
-    public String printToConsole(PrintStream out) {   
-       String message = "Configuration error. File provided not found";
-       out.println( String.format( "%s %nThe provided path was: %s",message, computed ) );
-       return message;
-    }   
     
+    public PacResult(HashMap<?,?> settings) {
+        this.settings = settings;
+    }
 }

@@ -24,10 +24,10 @@
 package net.praqma.jenkins.pac.command;
 
 import hudson.DescriptorExtensionList;
+import hudson.EnvVars;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -40,8 +40,8 @@ import net.praqma.jenkins.pac.exception.TailParameterNotFoundException;
  */
 public abstract class PACRunCommand implements Describable<PACRunCommand>, ExtensionPoint {
    
-    public abstract String run(File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException;
-    public abstract String getCommand(File workspace, String settingsFile, String pathToPac);
+    public abstract String run(EnvVars vars, File workspace, String settingsFile, String pathToPac) throws TailParameterNotFoundException;
+    public abstract String getCommand(File workspace, String settingsFile, String pathToPac, EnvVars vars);
     public abstract String getTail();
     protected static final Logger logger = Logger.getLogger(PACRunCommand.class.toString());
 

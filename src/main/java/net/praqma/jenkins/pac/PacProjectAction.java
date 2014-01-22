@@ -32,7 +32,7 @@ import hudson.model.ProminentProjectAction;
  * @author mads
  */
 public class PacProjectAction extends Actionable implements ProminentProjectAction {
-    
+  
     public final AbstractProject<?,?> project;
     
     public PacProjectAction(final AbstractProject<?,?> project) {
@@ -41,7 +41,7 @@ public class PacProjectAction extends Actionable implements ProminentProjectActi
 
     @Override
     public String getIconFileName() {
-        return "/plugin/PAC-plugin/images/64x64/pac-logo.png";
+        return PacBuilder.LOGO_LOCATION;
     }
 
     @Override
@@ -49,9 +49,17 @@ public class PacProjectAction extends Actionable implements ProminentProjectActi
         return "Latest PAC";
     }
 
+    /**
+     * Link to the latest changelog generated
+     * @return 
+     */
     @Override
     public String getUrlName() {
-        return getLatestPacBuildAction().build.number+ "/pac-publisher";
+        if(getLatestPacBuildAction() == null) {
+            return PacBuildAction.PAC_CHANGELOG_URL_NAME;
+        } else {
+            return getLatestPacBuildAction().build.number+ "/"+PacBuildAction.PAC_CHANGELOG_URL_NAME;
+        }
     }
 
     @Override

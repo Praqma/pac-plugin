@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.pac.commits;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import java.io.File;
@@ -71,17 +72,17 @@ public class LatestTagByPattern extends PACRunCommand implements Serializable {
     }
 
     @Override
-    public String run(File workspace, String settingsFile, String pathToPac) {
-        String latestCommand = getCommand(workspace, settingsFile, pathToPac);
+    public String run(EnvVars vars, File workspace, String settingsFile, String pathToPac) {
+        String latestCommand = getCommand(workspace, settingsFile, pathToPac, vars);
         CommandLine.getInstance().run(latestCommand, workspace);
         return latestCommand;
     }
 
     @Override
-    public String getCommand(File workspace, String settingsFile, String pathToPac) {
-        String latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s", pathToPac, settingsFile, workspace.getAbsolutePath(), "'" + getTail() + "'");
+    public String getCommand(File workspace, String settingsFile, String pathToPac, EnvVars vars) {
+        String latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s", pathToPac, settingsFile, workspace.getAbsolutePath());
         if(!StringUtils.isBlank(pattern)) {
-            latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s --pattern='%s'", pathToPac, settingsFile, workspace.getAbsolutePath(), "'" + getTail() + "'",pattern);
+            latestCommand = String.format("ruby %s -t LATEST --settings=%s --outpath=%s --pattern='%s'", pathToPac, settingsFile, workspace.getAbsolutePath() , vars.expand(pattern));
         }
         return latestCommand;
     }

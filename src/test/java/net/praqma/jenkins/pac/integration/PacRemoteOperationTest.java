@@ -25,8 +25,7 @@ package net.praqma.jenkins.pac.integration;
 
 import java.io.File;
 import net.praqma.jenkins.pac.exception.PacPathNotFoundException;
-import net.praqma.jenkins.pac.exception.SettingsFileNotFoundException;
-import net.praqma.jenkins.pac.PacRemoteOperation;
+import net.praqma.jenkins.pac.PacRemoteExecutor;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -37,20 +36,6 @@ import static org.junit.Assert.*;
 public class PacRemoteOperationTest {
 
     public PacRemoteOperationTest() {
-    }
-    
-    @Test (expected = SettingsFileNotFoundException.class)
-    public void testAbsolutifySettingsFileNotFound() throws SettingsFileNotFoundException {
-        PacRemoteOperation pro = new PacRemoteOperation(null, "unexisting.yml", null, null);
-        File settingsFile = new File(PacRemoteOperationTest.class.getResource("").getFile());
-        pro.absolutifySettingsFile(settingsFile);
-    }
-    
-    @Test (expected = PacPathNotFoundException.class)
-    public void testAbsolutifyPacFileNotFound() throws PacPathNotFoundException{
-        PacRemoteOperation pro = new PacRemoteOperation("unexisting.rb", null, null, null);
-        File pacFile = new File(PacRemoteOperationTest.class.getResource("").getFile());
-        pro.absolutifyPacFile(pacFile);
     }
      
     @Test

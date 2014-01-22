@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.pac;
 
+import hudson.AbortException;
 import net.praqma.jenkins.pac.command.PACRunCommandDescriptor;
 import net.praqma.jenkins.pac.command.PACRunCommand;
 import hudson.Extension;
@@ -37,6 +38,7 @@ import hudson.tasks.Builder;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.List;
 import net.praqma.jenkins.pac.exception.PacPathNotFoundException;
 import net.praqma.jenkins.pac.exception.SettingsFileNotFoundException;
@@ -50,6 +52,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  */
 public class PacBuilder extends Builder {
 
+    public static final String LOGO_LOCATION = "/plugin/PAC-plugin/images/64x64/pac-logo.png";
     public final String settingsFile;
     public final PACRunCommand pac;
     public final String pathToPac;
@@ -62,15 +65,15 @@ public class PacBuilder extends Builder {
     }
     
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, PacPathNotFoundException, SettingsFileNotFoundException, TailParameterNotFoundException {
-
+    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, PacPathNotFoundException, SettingsFileNotFoundException, TailParameterNotFoundException, IOException {
         PrintStream out = listener.getLogger();
 
         try {
-            String generatedChangeLog = build.getWorkspace().act(new PacRemoteOperation(pathToPac, settingsFile, pac, listener));
-            File buildRoot = new File(build.getRootDir(), generatedChangeLog);
-            FilePath local = new FilePath(buildRoot);
-            List<FilePath> files = build.getWorkspace().list(new PacChangelogFileFilter(generatedChangeLog));
+            PacResult res = build.getWorkspace().act(new PacRemoteExecutor(build.getEnvironment(listener), listener, pathToPac, settingsFile, pac));          
+            String changeLogName = (String) ((HashMap<?, ?>) res.settings.get(":general")).get("changelog_name");
+            File fullPathToHtml = new File(build.getRootDir(),"pac-folder/"+changeLogName +".html");
+            FilePath local = new FilePath(fullPathToHtml);            
+            List<FilePath> files = build.getWorkspace().list(new PacChangelogFileFilter(changeLogName));
 
             if (files.isEmpty()) {
                 out.println("No changelog created, no commits in your selection.");
@@ -79,20 +82,19 @@ public class PacBuilder extends Builder {
                     files.get(i).copyToWithPermission(local);
                     files.get(i).delete();
                 }
-                PacBuildAction action = new PacBuildAction(build, generatedChangeLog);
-                build.addAction(action);
-                
+                PacBuildAction action = new PacBuildAction(build, fullPathToHtml.getAbsoluteFile());
+                build.addAction(action);                
             }
         } catch (TailParameterNotFoundException tpnf) {
             tpnf.printToConsole(out);
-            return false;
+            throw new AbortException(tpnf.getMessage());
         } catch (PacPathNotFoundException ex) {
             ex.printToConsole(out);
-            return false;
+            throw new AbortException(ex.getMessage());
         } catch (SettingsFileNotFoundException ex2) {
-            ex2.printToConsole(out);
-            return false;
+            throw new AbortException(ex2.getMessage());
         } catch (IOException ex3) {
+            out.println("Unhandled exception caught.");
             ex3.printStackTrace(out);
             return false;
         }
